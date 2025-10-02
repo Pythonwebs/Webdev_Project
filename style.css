@@ -4,8 +4,8 @@
     font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 body{
-    background-image: url("https://images6.alphacoders.com/137/thumb-1920-1378546.png");
-}
+    background-color:pink;
+} 
 header{
     border: solid 2px orangered;
     height: 50px;
@@ -36,6 +36,9 @@ section{
 }
 a{
     text-decoration: none;
+    color: black;
+}
+a:hover{
     color: white;
 }
 input{

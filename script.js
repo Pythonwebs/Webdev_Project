@@ -1,61 +1,43 @@
-// Get the form and input elements
-const form = document.getElementById('search-form');
-const searchInput = document.getElementById('searchInput');
+
+// Select the form and input
+const form = document.getElementById("search-form");
+const searchInput = document.getElementById("searchInput");
 
 // Create a container to display results
-const resultsContainer = document.createElement('div');
-resultsContainer.id = 'results';
-document.body.insertBefore(resultsContainer, document.querySelector('footer'));
+const resultsContainer = document.createElement("div");
+resultsContainer.style.textAlign = "center";
+resultsContainer.style.marginTop = "20px";
+document.body.appendChild(resultsContainer);
 
-// Handle form submission
-form.addEventListener('submit', async (e) => {
-  e.preventDefault(); // Prevent page refresh
-
-  const query = searchInput.value.trim();
-  if (!query) return alert('Please enter an anime name.');
-
-  resultsContainer.innerHTML = 'Searching...';
-
-  try {
-    // Fetch data from Jikan API
-    const response = await fetch(`https://api.jikan.moe/v4/anime?q=${query}&limit=5`);
-    const data = await response.json();
-
-    if (data.data.length === 0) {
-      resultsContainer.innerHTML = 'No results found.';
-      return;
-    }
+form.addEventListener("submit", async (e) => {
+    e.preventDefault(); // Prevent form from reloading page
+    const query = searchInput.value.trim();
+    if (!query) return;
 
     // Clear previous results
-    resultsContainer.innerHTML = '';
+    resultsContainer.innerHTML = "Loading...";
 
-    // Loop through each anime and create HTML elements
-    data.data.forEach(anime => {
-      const animeDiv = document.createElement('div');
-      animeDiv.className = 'anime-result';
-      animeDiv.style.display = 'flex';
-      animeDiv.style.margin = '10px 0';
-      animeDiv.style.background = '#fff';
-      animeDiv.style.padding = '10px';
-      animeDiv.style.borderRadius = '6px';
-      animeDiv.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+    try {
+        // Fetch anime info from Jikan API
+        const response = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=1`);
+        const data = await response.json();
 
-      animeDiv.innerHTML = `
-        <img src="${anime.images.jpg.image_url}" alt="${anime.title}" style="width:80px;height:120px;margin-right:15px;border-radius:5px;">
-        <div>
-          <h3>${anime.title}</h3>
-          <p><strong>Type:</strong> ${anime.type}</p>
-          <p><strong>Episodes:</strong> ${anime.episodes || 'N/A'}</p>
-          <p><strong>Score:</strong> ${anime.score || 'N/A'}</p>
-          <p><strong>Synopsis:</strong> ${anime.synopsis ? anime.synopsis.substring(0, 200) + '...' : 'N/A'}</p>
-        </div>
-      `;
+        if (data.data.length === 0) {
+            resultsContainer.innerHTML = "No results found!";
+            return;
+        }
 
-      resultsContainer.appendChild(animeDiv);
-    });
-
-  } catch (error) {
-    console.error(error);
-    resultsContainer.innerHTML = 'Error fetching data.';
-  }
+        const anime = data.data[0]; // Take first result
+        resultsContainer.innerHTML = `
+            <h2>${anime.title}</h2>
+            <img src="${anime.images.jpg.image_url}" alt="${anime.title}" style="width:200px; border:2px solid black; border-radius:10px;">
+            <p>${anime.synopsis ? anime.synopsis : "No description available."}</p>
+            <p><strong>Episodes:</strong> ${anime.episodes ? anime.episodes : "N/A"}</p>
+            <p><strong>Score:</strong> ${anime.score ? anime.score : "N/A"}</p>
+        `;
+    } catch (error) {
+        resultsContainer.innerHTML = "Error fetching data!";
+        console.error(error);
+    }
 });
+
